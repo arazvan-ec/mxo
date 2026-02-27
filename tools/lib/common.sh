@@ -54,9 +54,10 @@ args_to_json() {
   for arg in "$@"; do
     local key="${arg%%=*}"
     local val="${arg#*=}"
-    # Try to parse as number/bool/null, fall back to string
-    if echo "$val" | jq -e '.' &>/dev/null 2>&1 && [[ "$val" != "" ]]; then
-      json=$(echo "$json" | jq --arg k "$key" --argjson v "$val" '.[$k] = $v')
+    # Only parse as native JSON for: pure numbers (no +prefix), booleans, null, arrays, objects
+    if [[ "$val" =~ ^-?[0-9]+\.?[0-9]*$ ]] || [[ "$val" == "true" ]] || [[ "$val" == "false" ]] || [[ "$val" == "null" ]] || [[ "$val" == \[* ]] || [[ "$val" == \{* ]]; then
+      json=$(echo "$json" | jq --arg k "$key" --argjson v "$val" '.[$k] = $v' 2>/dev/null) || \
+      json=$(echo "$json" | jq --arg k "$key" --arg v "$val" '.[$k] = $v')
     else
       json=$(echo "$json" | jq --arg k "$key" --arg v "$val" '.[$k] = $v')
     fi
