@@ -1,0 +1,19 @@
+{
+  "task_id": "003_api_backend",
+  "title": "Build API-only backend with Hono over file-based storage",
+  "status": "in_progress",
+  "created": "2026-02-28T00:20:00Z",
+  "updated": "2026-02-28T00:20:00Z",
+  "description": "Create a REST API that exposes all entity CRUD operations and agent operations. The API reads/writes the same JSON files that agents use directly. This achieves parity: agents work via files, clients work via API, same data.",
+  "acceptance_criteria": [
+    "Node.js + Hono API server runs and serves JSON",
+    "Generic CRUD engine reads/writes entity JSON files",
+    "All entity types have REST endpoints",
+    "Auth middleware with role-based access",
+    "Multi-tenancy filtering by customer_id/driver_id",
+    "Operations endpoints to trigger agent capabilities",
+    "Status transition validation against config/statuses.json"
+  ],
+  "dependencies": ["002_mxo_track_domain_model"],
+  "tags": ["api", "backend", "hono", "parity"]
+}
