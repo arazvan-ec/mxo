@@ -1,0 +1,61 @@
+{
+  "schema_version": "1.0.0",
+  "description": "All entity status definitions and valid transitions",
+  "service": {
+    "values": ["draft", "confirmed", "processing", "completed", "cancelled"],
+    "transitions": {
+      "draft": ["confirmed", "cancelled"],
+      "confirmed": ["processing", "cancelled"],
+      "processing": ["completed", "cancelled"],
+      "completed": [],
+      "cancelled": []
+    }
+  },
+  "shipment": {
+    "values": ["created", "picked_up", "in_transit", "out_for_delivery", "delivered", "exception"],
+    "transitions": {
+      "created": ["picked_up", "exception"],
+      "picked_up": ["in_transit", "exception"],
+      "in_transit": ["out_for_delivery", "exception"],
+      "out_for_delivery": ["delivered", "exception"],
+      "delivered": [],
+      "exception": ["created"]
+    }
+  },
+  "route": {
+    "values": ["planned", "active", "done", "cancelled"],
+    "transitions": {
+      "planned": ["active", "cancelled"],
+      "active": ["done", "cancelled"],
+      "done": [],
+      "cancelled": []
+    }
+  },
+  "route_stop": {
+    "values": ["pending", "delivered", "exception", "skipped"],
+    "transitions": {
+      "pending": ["delivered", "exception", "skipped"],
+      "delivered": [],
+      "exception": ["pending"],
+      "skipped": ["pending"]
+    }
+  },
+  "parcel": {
+    "values": ["registered", "loaded", "in_transit", "delivered", "exception", "returned"],
+    "transitions": {
+      "registered": ["loaded", "exception"],
+      "loaded": ["in_transit", "exception"],
+      "in_transit": ["delivered", "exception"],
+      "delivered": [],
+      "exception": ["returned", "registered"],
+      "returned": []
+    }
+  },
+  "exception_types": [
+    "absent",
+    "wrong_address",
+    "refused",
+    "damaged",
+    "other"
+  ]
+}

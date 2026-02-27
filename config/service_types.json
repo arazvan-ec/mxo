@@ -1,0 +1,24 @@
+{
+  "schema_version": "1.0.0",
+  "description": "Types of logistics services offered by the platform",
+  "service_types": {
+    "delivery": {
+      "label": "Package Delivery",
+      "description": "Standard delivery from origin to destination",
+      "requires_pickup": false,
+      "requires_return": false
+    },
+    "delivery_pickup": {
+      "label": "Delivery + Pickup",
+      "description": "Deliver package and collect return/exchange at same stop",
+      "requires_pickup": true,
+      "requires_return": false
+    },
+    "return": {
+      "label": "Return / Devolution",
+      "description": "Collect package from recipient for return to sender",
+      "requires_pickup": true,
+      "requires_return": true
+    }
+  }
+}

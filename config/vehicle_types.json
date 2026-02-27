@@ -1,0 +1,48 @@
+{
+  "schema_version": "1.0.0",
+  "description": "Vehicle type templates with default capacity configurations",
+  "vehicle_types": {
+    "van_small": {
+      "label": "Small Van",
+      "description": "Small delivery van (e.g., Renault Kangoo, Citroën Berlingo)",
+      "max_weight_kg": 600,
+      "max_volume_m3": 3.0,
+      "max_parcels": 80
+    },
+    "van_medium": {
+      "label": "Medium Van",
+      "description": "Medium delivery van (e.g., Mercedes Vito, VW Transporter)",
+      "max_weight_kg": 1200,
+      "max_volume_m3": 6.0,
+      "max_parcels": 150
+    },
+    "van_large": {
+      "label": "Large Van",
+      "description": "Large delivery van (e.g., Mercedes Sprinter, Iveco Daily)",
+      "max_weight_kg": 2000,
+      "max_volume_m3": 12.0,
+      "max_parcels": 250
+    },
+    "truck_light": {
+      "label": "Light Truck",
+      "description": "Light rigid truck (3.5t - 7.5t)",
+      "max_weight_kg": 5000,
+      "max_volume_m3": 25.0,
+      "max_parcels": 500
+    },
+    "truck_heavy": {
+      "label": "Heavy Truck",
+      "description": "Heavy rigid truck (7.5t+)",
+      "max_weight_kg": 12000,
+      "max_volume_m3": 50.0,
+      "max_parcels": 1000
+    },
+    "motorcycle": {
+      "label": "Motorcycle / Bike",
+      "description": "Motorcycle or cargo bicycle for urban delivery",
+      "max_weight_kg": 30,
+      "max_volume_m3": 0.2,
+      "max_parcels": 15
+    }
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0.0",
+  "description": "Role definitions and access scopes for mxo-track",
+  "roles": {
+    "admin": {
+      "label": "Administrator",
+      "scope": "global",
+      "description": "Full platform access. Manages customers, vehicles, drivers, routes, imports, reports, billing.",
+      "can_access": ["*"]
+    },
+    "operator": {
+      "label": "Operator",
+      "scope": "global",
+      "description": "Operations access. Route planning, fleet monitoring, driver management.",
+      "can_access": ["routes", "vehicles", "drivers", "shipments", "tracking", "notifications"]
+    },
+    "customer": {
+      "label": "Customer",
+      "scope": "customer_id",
+      "description": "B2B tenant. Sees only own data filtered by customer_id.",
+      "can_access": ["shipments", "routes", "tracking", "services", "notifications"]
+    },
+    "driver": {
+      "label": "Driver",
+      "scope": "driver_id",
+      "description": "Delivery driver. Sees only assigned routes and stops.",
+      "can_access": ["routes", "shipments", "tracking"]
+    },
+    "public": {
+      "label": "Public",
+      "scope": "tracking_token",
+      "description": "Unauthenticated. Can only track a single shipment by TRK token.",
+      "can_access": ["tracking"]
+    }
+  }
+}
