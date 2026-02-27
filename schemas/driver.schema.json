@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Driver",
+  "description": "Delivery driver. Assigned to routes, executes deliveries, reports exceptions.",
+  "type": "object",
+  "required": ["id", "name", "created", "updated"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique driver identifier"
+    },
+    "name": {
+      "type": "string",
+      "description": "Full name"
+    },
+    "email": {
+      "type": "string",
+      "description": "Email address"
+    },
+    "phone": {
+      "type": "string",
+      "description": "Phone number"
+    },
+    "customer_id": {
+      "type": "string",
+      "description": "Associated customer (if driver is exclusive to one customer)"
+    },
+    "vehicle_id": {
+      "type": "string",
+      "description": "Currently assigned vehicle"
+    },
+    "status": {
+      "type": "string",
+      "description": "Status: active, inactive, on_route"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Free-form notes"
+    },
+    "created": {
+      "type": "string",
+      "description": "ISO 8601 creation timestamp"
+    },
+    "updated": {
+      "type": "string",
+      "description": "ISO 8601 last update timestamp"
+    }
+  }
+}
