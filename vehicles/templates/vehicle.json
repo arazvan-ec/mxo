@@ -1,0 +1,16 @@
+{
+  "id": "",
+  "name": "",
+  "plate": "",
+  "vehicle_type": "",
+  "max_weight_kg": 0,
+  "max_volume_m3": 0,
+  "max_parcels": null,
+  "traccar_device_id": "",
+  "current_driver_id": null,
+  "status": "available",
+  "last_position": null,
+  "created_at": "",
+  "updated_at": "",
+  "notes": ""
+}
