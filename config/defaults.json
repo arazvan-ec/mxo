@@ -1,0 +1,12 @@
+{
+  "avg_speed_kmh": 30,
+  "stop_time_min": 2,
+  "max_exceptions_alert": 3,
+  "offline_threshold_min": 30,
+  "tracking_token_format": "TRK-XXXX-XXXX",
+  "position_anonymize_meters": 500,
+  "currency": "EUR",
+  "timezone": "Europe/Madrid",
+  "csv_delimiter": ",",
+  "csv_encoding": "utf-8"
+}

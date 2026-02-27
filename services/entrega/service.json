@@ -1,0 +1,18 @@
+{
+  "id": "entrega",
+  "name": "Paquetería Entrega",
+  "type": "entrega",
+  "description": "Standard delivery from origin to destination",
+  "requires_pickup": false,
+  "requires_return": false,
+  "requires_signature": true,
+  "estimated_stop_time_min": 2,
+  "package_requirements": {
+    "weight_required": true,
+    "volume_required": true,
+    "ean_required": false,
+    "description_required": false
+  },
+  "created": "2026-02-27T23:33:44Z",
+  "updated": "2026-02-27T23:33:44Z"
+}

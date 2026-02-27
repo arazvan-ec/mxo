@@ -1,0 +1,18 @@
+{
+  "id": "devolucion",
+  "name": "Paquetería Devolución",
+  "type": "devolucion",
+  "description": "Return shipment from destination back to origin",
+  "requires_pickup": false,
+  "requires_return": true,
+  "requires_signature": true,
+  "estimated_stop_time_min": 2,
+  "package_requirements": {
+    "weight_required": true,
+    "volume_required": true,
+    "ean_required": false,
+    "description_required": false
+  },
+  "created": "2026-02-27T23:33:44Z",
+  "updated": "2026-02-27T23:33:44Z"
+}
