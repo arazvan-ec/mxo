@@ -58,11 +58,19 @@ Numeric prefix ensures chronological ordering. Description ensures human readabi
   - 9 agent operations defined as composable prompts
   - Config layer with roles, statuses, service types, vehicle types
   - CLAUDE.md updated with domain-specific rules
+- 2026-02-28: API backend implemented (task 003)
+  - Hono + TypeScript REST API over file-based storage
+  - Generic CRUD engine for all 11 entity types
+  - Auth middleware with role-based access
+  - Multi-tenancy filtering by customer_id/driver_id
+  - Operations API for listing and reading agent prompts
+  - Config API for platform configuration
 
 ## Completed Tasks
 
 - `001_bootstrap_project` — Project initialization
 - `002_mxo_track_domain_model` — Full domain model for logistics platform
+- `003_api_backend` — REST API over file-based storage (Hono + TypeScript)
 
 ## Active Tasks
 
@@ -74,3 +82,4 @@ Numeric prefix ensures chronological ordering. Description ensures human readabi
 - Execute end-to-end flow: CSV import → route creation → optimization → delivery
 - Refine operation prompts based on first real executions
 - Add pricing config for billing operations
+- Add frontend (React/Next.js) consuming the API

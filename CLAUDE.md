@@ -150,6 +150,19 @@ mxo/
 │   ├── billing_summary/prompt.md
 │   ├── auto_assign_routes/prompt.md
 │   └── context.md
+├── api/                                   # REST API (Hono + TypeScript)
+│   ├── src/
+│   │   ├── index.ts                       # Server entry point
+│   │   ├── storage/file_store.ts          # Generic file-based CRUD engine
+│   │   ├── lib/ulid.ts                    # ULID ID generator
+│   │   ├── lib/status.ts                  # Status transition validation
+│   │   ├── middleware/auth.ts             # Auth with role extraction
+│   │   ├── middleware/tenant.ts           # Multi-tenancy filter
+│   │   ├── routes/crud_factory.ts         # Generic CRUD route generator
+│   │   ├── routes/entities.ts             # Entity config registry
+│   │   └── routes/operations.ts           # Operations API
+│   ├── package.json
+│   └── tsconfig.json
 └── tasks/                                 # Task tracking system
     ├── context.md
     ├── templates/task.json
@@ -208,6 +221,29 @@ Service Request → Parcels → Shipments → Route Planning → Capacity Check 
 ```
 
 Every step in this flow is an agent operation that reads and writes files.
+
+### API Layer (Parity Interface)
+
+The REST API at `api/` provides HTTP access to the same file-based data. Run from `api/` directory:
+
+```bash
+cd api && npm run dev     # Development with hot reload
+cd api && npm start       # Production
+```
+
+**Endpoints**:
+- `GET /api` — Discovery (list all entities and operations)
+- `GET/POST /api/{entity}` — List all / Create
+- `GET/PATCH/DELETE /api/{entity}/{id}` — Get / Update / Delete
+- `GET /api/{entity}/{id}/{sub}` — List sub-entities (stops, events, locations)
+- `GET /api/operations` — List available operations
+- `GET /api/operations/{name}/prompt` — Get operation prompt
+- `GET /api/config/{name}` — Get platform config (roles, statuses, etc.)
+
+**Auth** (via headers):
+- `X-User-Role`: admin, operator, customer, driver, public
+- `X-Customer-Id`: customer scope
+- `X-Driver-Id`: driver scope
 
 ---
 
