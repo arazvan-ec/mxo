@@ -1,0 +1,15 @@
+{
+  "id": "",
+  "service_id": "",
+  "shipment_id": null,
+  "sequence": "",
+  "weight_kg": 0,
+  "volume_m3": 0,
+  "ean": "",
+  "description": "",
+  "status": "registered",
+  "exception_type": null,
+  "exception_notes": "",
+  "created_at": "",
+  "updated_at": ""
+}
