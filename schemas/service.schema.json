@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Service",
+  "description": "Service type definition. Determines what kind of delivery operation is performed.",
+  "type": "object",
+  "required": ["id", "name", "type", "created", "updated"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Service type identifier (e.g. 'entrega', 'entrega_recogida', 'devolucion')"
+    },
+    "name": {
+      "type": "string",
+      "description": "Human-readable service name"
+    },
+    "type": {
+      "type": "string",
+      "description": "Service type: entrega, entrega_recogida, devolucion"
+    },
+    "description": {
+      "type": "string",
+      "description": "Detailed description of the service"
+    },
+    "requires_pickup": {
+      "type": "boolean",
+      "description": "Whether this service includes a pickup leg"
+    },
+    "requires_return": {
+      "type": "boolean",
+      "description": "Whether this service includes a return leg"
+    },
+    "requires_signature": {
+      "type": "boolean",
+      "description": "Whether proof of delivery signature is mandatory"
+    },
+    "estimated_stop_time_min": {
+      "type": "number",
+      "description": "Estimated time per stop in minutes (overrides system default)"
+    },
+    "package_requirements": {
+      "type": "object",
+      "description": "Requirements for packages in this service",
+      "properties": {
+        "weight_required": { "type": "boolean" },
+        "volume_required": { "type": "boolean" },
+        "ean_required": { "type": "boolean" },
+        "description_required": { "type": "boolean" }
+      }
+    },
+    "notes": {
+      "type": "string"
+    },
+    "created": {
+      "type": "string",
+      "description": "ISO 8601 creation timestamp"
+    },
+    "updated": {
+      "type": "string",
+      "description": "ISO 8601 last update timestamp"
+    }
+  }
+}
