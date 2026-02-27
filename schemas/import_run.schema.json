@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ImportRun",
+  "description": "Record of a CSV import operation. Tracks rows processed, created, skipped, and errors.",
+  "type": "object",
+  "required": ["id", "customer_id", "filename", "status", "created"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique import run identifier"
+    },
+    "customer_id": {
+      "type": "string",
+      "description": "Customer the shipments belong to"
+    },
+    "filename": {
+      "type": "string",
+      "description": "Original CSV filename"
+    },
+    "status": {
+      "type": "string",
+      "description": "Import status: pending, running, completed, failed"
+    },
+    "total_rows": {
+      "type": "integer",
+      "description": "Total rows in CSV"
+    },
+    "created_count": {
+      "type": "integer",
+      "description": "Shipments successfully created"
+    },
+    "skipped_count": {
+      "type": "integer",
+      "description": "Rows skipped (duplicates)"
+    },
+    "error_count": {
+      "type": "integer",
+      "description": "Rows with errors"
+    },
+    "errors": {
+      "type": "array",
+      "description": "Detailed error list",
+      "items": {
+        "type": "object",
+        "properties": {
+          "row": { "type": "integer" },
+          "field": { "type": "string" },
+          "message": { "type": "string" }
+        }
+      }
+    },
+    "shipment_ids": {
+      "type": "array",
+      "description": "IDs of created shipments",
+      "items": { "type": "string" }
+    },
+    "created": {
+      "type": "string",
+      "description": "ISO 8601 start timestamp"
+    },
+    "completed_at": {
+      "type": "string",
+      "description": "ISO 8601 completion timestamp"
+    }
+  }
+}
