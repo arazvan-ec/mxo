@@ -1,0 +1,123 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "RouteStop",
+  "description": "A stop within a delivery route. Links to a shipment and tracks delivery status + POD.",
+  "type": "object",
+  "required": ["id", "route_id", "shipment_id", "sequence", "address", "lat", "lng", "status", "created", "updated"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique stop identifier"
+    },
+    "route_id": {
+      "type": "string",
+      "description": "Parent route identifier"
+    },
+    "shipment_id": {
+      "type": "string",
+      "description": "Associated shipment"
+    },
+    "sequence": {
+      "type": "integer",
+      "description": "Order in the route (1-based)"
+    },
+    "address": {
+      "type": "string",
+      "description": "Delivery address"
+    },
+    "lat": {
+      "type": "number",
+      "description": "Latitude"
+    },
+    "lng": {
+      "type": "number",
+      "description": "Longitude"
+    },
+    "recipient_name": {
+      "type": "string",
+      "description": "Recipient name"
+    },
+    "status": {
+      "type": "string",
+      "description": "Stop status: pending, arrived, delivered, exception, skipped"
+    },
+    "delivery_window_start": {
+      "type": "string",
+      "description": "Preferred delivery window start (ISO 8601)"
+    },
+    "delivery_window_end": {
+      "type": "string",
+      "description": "Preferred delivery window end (ISO 8601)"
+    },
+    "arrived_at": {
+      "type": "string",
+      "description": "When driver arrived at stop"
+    },
+    "completed_at": {
+      "type": "string",
+      "description": "When delivery/exception was recorded"
+    },
+    "eta": {
+      "type": "string",
+      "description": "Estimated time of arrival (ISO 8601, calculated dynamically)"
+    },
+    "pod": {
+      "type": "object",
+      "description": "Proof of Delivery",
+      "properties": {
+        "signed_by_name": {
+          "type": "string",
+          "description": "Name of person who signed"
+        },
+        "recipient_id_encoded": {
+          "type": "string",
+          "description": "Encoded recipient ID for privacy"
+        },
+        "confirmed_by_driver": {
+          "type": "boolean",
+          "description": "Driver explicit confirmation"
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "ISO 8601 when POD was recorded"
+        },
+        "notes": {
+          "type": "string",
+          "description": "Delivery notes"
+        }
+      }
+    },
+    "exception": {
+      "type": "object",
+      "description": "Exception details (when status=exception)",
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "Exception type: ausente, direccion_incorrecta, rechazado, danado, otro"
+        },
+        "reason": {
+          "type": "string",
+          "description": "Detailed reason"
+        },
+        "timestamp": {
+          "type": "string"
+        }
+      }
+    },
+    "distance_from_previous_km": {
+      "type": "number",
+      "description": "Distance from previous stop in km (set by optimizer)"
+    },
+    "notes": {
+      "type": "string"
+    },
+    "created": {
+      "type": "string",
+      "description": "ISO 8601 creation timestamp"
+    },
+    "updated": {
+      "type": "string",
+      "description": "ISO 8601 last update timestamp"
+    }
+  }
+}

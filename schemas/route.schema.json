@@ -1,0 +1,96 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Route",
+  "description": "Delivery route with stops. Has a driver, vehicle, origin point, and status lifecycle.",
+  "type": "object",
+  "required": ["id", "name", "status", "customer_id", "origin_lat", "origin_lng", "created", "updated"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique route identifier"
+    },
+    "name": {
+      "type": "string",
+      "description": "Route display name"
+    },
+    "status": {
+      "type": "string",
+      "description": "Route status: planned, active, done, cancelled"
+    },
+    "customer_id": {
+      "type": "string",
+      "description": "Customer who owns this route's shipments"
+    },
+    "driver_id": {
+      "type": "string",
+      "description": "Assigned driver"
+    },
+    "vehicle_id": {
+      "type": "string",
+      "description": "Assigned vehicle"
+    },
+    "origin_lat": {
+      "type": "number",
+      "description": "Route origin latitude (warehouse/depot)"
+    },
+    "origin_lng": {
+      "type": "number",
+      "description": "Route origin longitude (warehouse/depot)"
+    },
+    "origin_address": {
+      "type": "string",
+      "description": "Route origin address"
+    },
+    "total_stops": {
+      "type": "integer",
+      "description": "Total number of stops"
+    },
+    "total_weight_kg": {
+      "type": "number",
+      "description": "Total weight of all packages across all stops"
+    },
+    "total_volume_m3": {
+      "type": "number",
+      "description": "Total volume of all packages across all stops"
+    },
+    "total_distance_km": {
+      "type": "number",
+      "description": "Total route distance in kilometers (calculated by optimizer)"
+    },
+    "estimated_duration_min": {
+      "type": "number",
+      "description": "Estimated total duration in minutes"
+    },
+    "started_at": {
+      "type": "string",
+      "description": "ISO 8601 timestamp when route was started"
+    },
+    "completed_at": {
+      "type": "string",
+      "description": "ISO 8601 timestamp when route was completed"
+    },
+    "stops_delivered": {
+      "type": "integer",
+      "description": "Count of delivered stops"
+    },
+    "stops_exception": {
+      "type": "integer",
+      "description": "Count of exception stops"
+    },
+    "stops_pending": {
+      "type": "integer",
+      "description": "Count of pending stops"
+    },
+    "notes": {
+      "type": "string"
+    },
+    "created": {
+      "type": "string",
+      "description": "ISO 8601 creation timestamp"
+    },
+    "updated": {
+      "type": "string",
+      "description": "ISO 8601 last update timestamp"
+    }
+  }
+}
