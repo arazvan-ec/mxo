@@ -1,0 +1,127 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Shipment",
+  "description": "A delivery shipment containing one or more packages (bultos). Each shipment has a tracking token for public tracking.",
+  "type": "object",
+  "required": ["id", "reference", "customer_id", "recipient_name", "address", "lat", "lng", "created", "updated"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique shipment identifier"
+    },
+    "reference": {
+      "type": "string",
+      "description": "External reference number (unique per customer, used for dedup)"
+    },
+    "customer_id": {
+      "type": "string",
+      "description": "Customer who owns this shipment"
+    },
+    "service_type": {
+      "type": "string",
+      "description": "Service type: entrega, entrega_recogida, devolucion"
+    },
+    "recipient_name": {
+      "type": "string",
+      "description": "Delivery recipient name"
+    },
+    "address": {
+      "type": "string",
+      "description": "Delivery address"
+    },
+    "lat": {
+      "type": "number",
+      "description": "Latitude of delivery address"
+    },
+    "lng": {
+      "type": "number",
+      "description": "Longitude of delivery address"
+    },
+    "phone": {
+      "type": "string",
+      "description": "Recipient phone number"
+    },
+    "tracking_token": {
+      "type": "string",
+      "description": "Public tracking token (TRK-XXXX-XXXX format)"
+    },
+    "packages": {
+      "type": "array",
+      "description": "Packages/bultos in this shipment (1/5, 2/5, etc.)",
+      "items": {
+        "type": "object",
+        "required": ["id", "weight_kg", "volume_m3"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Package identifier"
+          },
+          "weight_kg": {
+            "type": "number",
+            "description": "Package weight in kilograms (mandatory)"
+          },
+          "volume_m3": {
+            "type": "number",
+            "description": "Package volume in cubic meters (mandatory)"
+          },
+          "ean": {
+            "type": "string",
+            "description": "EAN barcode"
+          },
+          "description": {
+            "type": "string",
+            "description": "Package description"
+          },
+          "status": {
+            "type": "string",
+            "description": "Package status: pending, cargado, en_ruta, entregado, ausencia, devuelto"
+          }
+        }
+      }
+    },
+    "total_packages": {
+      "type": "integer",
+      "description": "Total number of packages"
+    },
+    "total_weight_kg": {
+      "type": "number",
+      "description": "Sum of all package weights"
+    },
+    "total_volume_m3": {
+      "type": "number",
+      "description": "Sum of all package volumes"
+    },
+    "status": {
+      "type": "string",
+      "description": "Overall shipment status (derived from events)"
+    },
+    "delivery_window_start": {
+      "type": "string",
+      "description": "Preferred delivery window start (ISO 8601)"
+    },
+    "delivery_window_end": {
+      "type": "string",
+      "description": "Preferred delivery window end (ISO 8601)"
+    },
+    "estimated_delivery_date": {
+      "type": "string",
+      "description": "Estimated delivery date (ISO 8601)"
+    },
+    "route_id": {
+      "type": "string",
+      "description": "Assigned route (set when added to a route)"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Delivery notes"
+    },
+    "created": {
+      "type": "string",
+      "description": "ISO 8601 creation timestamp"
+    },
+    "updated": {
+      "type": "string",
+      "description": "ISO 8601 last update timestamp"
+    }
+  }
+}
