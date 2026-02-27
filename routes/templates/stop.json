@@ -1,0 +1,20 @@
+{
+  "id": "",
+  "route_id": "",
+  "shipment_id": "",
+  "sequence": 0,
+  "address": "",
+  "latitude": null,
+  "longitude": null,
+  "recipient_name": "",
+  "status": "pending",
+  "delivery_window": null,
+  "eta": null,
+  "arrived_at": null,
+  "completed_at": null,
+  "pod": null,
+  "exception_type": null,
+  "exception_notes": "",
+  "distance_from_prev_km": null,
+  "time_from_prev_min": null
+}
