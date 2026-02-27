@@ -2,7 +2,7 @@ import { readFile, writeFile, mkdir, readdir, rm, access } from "fs/promises";
 import { join } from "path";
 import { ulid } from "../lib/ulid.ts";
 
-const DATA_ROOT = join(import.meta.dirname, "..", "..", "..");
+const DATA_ROOT = join(process.cwd(), "..");
 
 export interface EntityConfig {
   /** Directory name under DATA_ROOT (e.g., "customers", "vehicles") */

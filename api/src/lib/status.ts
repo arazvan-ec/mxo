@@ -1,7 +1,7 @@
 import { readFile } from "fs/promises";
 import { join } from "path";
 
-const DATA_ROOT = join(import.meta.dirname, "..", "..", "..");
+const DATA_ROOT = join(process.cwd(), "..");
 
 interface StatusConfig {
   values: string[];
