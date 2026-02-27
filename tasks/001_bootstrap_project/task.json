@@ -1,0 +1,17 @@
+{
+  "task_id": "001_bootstrap_project",
+  "title": "Bootstrap agent-native project",
+  "status": "completed",
+  "created": "2026-02-27T22:00:00Z",
+  "updated": "2026-02-27T22:30:00Z",
+  "description": "Initialize the mxo repository with agent-native architecture: reference docs, project rules, and file-based task tracking system",
+  "acceptance_criteria": [
+    "Reference article saved to docs/reference/",
+    "CLAUDE.md created with all mandatory rules",
+    "Task tracking system operational with template and context",
+    "All commits atomic with immediate push",
+    "First task (this one) created as working example"
+  ],
+  "dependencies": [],
+  "tags": ["infrastructure", "bootstrap"]
+}
