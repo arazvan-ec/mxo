@@ -1,0 +1,27 @@
+{
+  "id": "",
+  "customer_id": "",
+  "service_type": "delivery",
+  "status": "draft",
+  "reference": "",
+  "origin_location_id": null,
+  "destination_address": "",
+  "destination_latitude": null,
+  "destination_longitude": null,
+  "recipient_name": "",
+  "recipient_phone": "",
+  "recipient_email": "",
+  "total_parcels": 0,
+  "total_weight_kg": 0,
+  "total_volume_m3": 0,
+  "estimated_delivery_date": null,
+  "delivery_window": {
+    "from": null,
+    "to": null,
+    "preference": "any"
+  },
+  "shipment_ids": [],
+  "created_at": "",
+  "updated_at": "",
+  "notes": ""
+}
