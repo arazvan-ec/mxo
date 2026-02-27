@@ -1,0 +1,20 @@
+{
+  "id": "",
+  "name": "",
+  "email": "",
+  "phone": "",
+  "license_number": "",
+  "assigned_vehicle_id": null,
+  "customer_id": null,
+  "status": "active",
+  "productivity_stats": {
+    "total_deliveries": 0,
+    "total_exceptions": 0,
+    "success_rate": 0,
+    "avg_delivery_time_min": 0,
+    "last_updated": null
+  },
+  "created_at": "",
+  "updated_at": "",
+  "notes": ""
+}
