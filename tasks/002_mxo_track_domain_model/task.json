@@ -1,9 +1,9 @@
 {
   "task_id": "002_mxo_track_domain_model",
   "title": "Design and implement mxo-track agent-native domain model",
-  "status": "in_progress",
+  "status": "completed",
   "created": "2026-02-27T23:30:00Z",
-  "updated": "2026-02-27T23:30:00Z",
+  "updated": "2026-02-28T00:15:00Z",
   "description": "Design the full mxo-track logistics platform as an agent-native system. All entities are file-based, all operations are atomic primitives, agents compose capabilities via prompts.",
   "acceptance_criteria": [
     "All entity types defined with JSON schemas",
