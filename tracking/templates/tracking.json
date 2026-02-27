@@ -1,0 +1,10 @@
+{
+  "token": "",
+  "shipment_id": "",
+  "status": "created",
+  "recipient_name": "",
+  "estimated_delivery": null,
+  "timeline": [],
+  "vehicle_position": null,
+  "updated_at": ""
+}
