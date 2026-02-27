@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Customer",
+  "description": "Company client that uses the logistics platform. Multi-tenant: each customer sees only their data.",
+  "type": "object",
+  "required": ["id", "name", "created", "updated"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique customer identifier"
+    },
+    "name": {
+      "type": "string",
+      "description": "Company name"
+    },
+    "address": {
+      "type": "string",
+      "description": "Company address"
+    },
+    "phone": {
+      "type": "string",
+      "description": "Contact phone number"
+    },
+    "email": {
+      "type": "string",
+      "description": "Contact email"
+    },
+    "webhook_url": {
+      "type": "string",
+      "description": "URL for event webhooks (HMAC-SHA256 signed)"
+    },
+    "webhook_secret": {
+      "type": "string",
+      "description": "Secret key for webhook HMAC signature"
+    },
+    "frequency_category": {
+      "type": "string",
+      "description": "Delivery frequency: no_frecuente, frecuente, muy_frecuente, super_frecuente"
+    },
+    "locations": {
+      "type": "array",
+      "description": "Warehouses/offices (origins for routes)",
+      "items": {
+        "type": "object",
+        "required": ["name", "lat", "lng"],
+        "properties": {
+          "name": { "type": "string" },
+          "address": { "type": "string" },
+          "lat": { "type": "number" },
+          "lng": { "type": "number" }
+        }
+      }
+    },
+    "notes": {
+      "type": "string",
+      "description": "Free-form notes"
+    },
+    "status": {
+      "type": "string",
+      "description": "Active status: active, inactive"
+    },
+    "created": {
+      "type": "string",
+      "description": "ISO 8601 creation timestamp"
+    },
+    "updated": {
+      "type": "string",
+      "description": "ISO 8601 last update timestamp"
+    }
+  }
+}
