@@ -1,0 +1,21 @@
+reference,recipient_name,address,lat,lng,phone,notes,weight_kg,volume_m3,ean,description
+REF-001,Juan García,Calle Mayor 10 Madrid,40.4168,-3.7038,+34600111001,Planta 2 Izq,5.2,0.03,8412345678901,Caja electrónica
+REF-002,María López,Av. Diagonal 450 Barcelona,41.3874,2.1686,+34600111002,Portería,3.1,0.02,8412345678902,Documentos
+REF-003,Pedro Martínez,Calle Colón 25 Valencia,39.4699,-0.3763,+34600111003,Horario mañana,8.5,0.05,8412345678903,Repuestos maquinaria
+REF-004,Ana Ruiz,Gran Vía 42 Madrid,40.4200,-3.7025,+34600111004,,2.0,0.01,,Sobre urgente
+REF-005,Carlos Sánchez,Paseo de Gracia 100 Barcelona,41.3930,2.1640,+34600111005,Dejar en recepción,12.0,0.08,8412345678905,Material oficina
+REF-006,Laura Fernández,Calle Sierpes 15 Sevilla,37.3891,-5.9945,+34600111006,,4.5,0.03,8412345678906,Componentes
+REF-007,Miguel Torres,Calle Larios 8 Málaga,36.7213,-4.4214,+34600111007,Llamar antes,6.8,0.04,,Herramientas
+REF-008,Elena Vega,Plaza del Pilar 1 Zaragoza,41.6563,-0.8811,+34600111008,,1.5,0.01,8412345678908,Libro
+REF-009,Pablo Moreno,Av. de la Constitución 20 Sevilla,37.3886,-5.9953,+34600111009,Frágil,15.0,0.10,8412345678909,Cristalería
+REF-010,Sofía Jiménez,Calle Alcalá 100 Madrid,40.4225,-3.6760,+34600111010,,7.3,0.04,8412345678910,Ropa
+REF-011,Diego Romero,Rambla de Catalunya 50 Barcelona,41.3910,2.1630,+34600111011,,3.8,0.02,,Accesorios
+REF-012,Carmen Navarro,Calle San Vicente 30 Valencia,39.4700,-0.3750,+34600111012,Entregar en mano,9.2,0.06,8412345678912,Equipamiento deportivo
+REF-013,Javier Díaz,Paseo del Prado 5 Madrid,40.4140,-3.6930,+34600111013,,2.5,0.02,8412345678913,Farmacia
+REF-014,Isabel Castro,Calle Uria 20 Oviedo,43.3614,-5.8593,+34600111014,,11.0,0.07,,Material de construcción
+REF-015,Roberto Gil,Av. Blasco Ibáñez 10 Valencia,39.4800,-0.3600,+34600111015,Solo tardes,4.0,0.03,8412345678915,Alimentación seca
+REF-016,Teresa Molina,Calle Alfonso I 15 Zaragoza,41.6520,-0.8780,+34600111016,,6.5,0.04,8412345678916,Textil
+REF-017,Alberto Rubio,Paseo de la Castellana 200 Madrid,40.4500,-3.6900,+34600111017,Recepción planta 3,20.0,0.15,8412345678917,Servidor rack
+REF-018,Patricia Ortega,Calle Preciados 5 Madrid,40.4180,-3.7010,+34600111018,,1.2,0.01,,Joyería
+REF-019,Fernando Delgado,Av. de Andalucía 1 Málaga,36.7200,-4.4200,+34600111019,,8.0,0.05,8412345678919,Fontanería
+REF-020,Lucía Herrero,Calle Tetuán 10 Sevilla,37.3900,-5.9960,+34600111020,Frágil cuidado,3.5,0.02,8412345678920,Decoración
