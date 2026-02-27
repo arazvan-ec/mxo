@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Vehicle",
+  "description": "Fleet vehicle with capacity constraints. Capacity (weight+volume) determines how many packages fit.",
+  "type": "object",
+  "required": ["id", "name", "capacity_kg", "capacity_m3", "created", "updated"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique vehicle identifier"
+    },
+    "name": {
+      "type": "string",
+      "description": "Vehicle display name (e.g. 'Furgoneta 1')"
+    },
+    "plate": {
+      "type": "string",
+      "description": "License plate number"
+    },
+    "capacity_kg": {
+      "type": "number",
+      "description": "Maximum weight capacity in kilograms"
+    },
+    "capacity_m3": {
+      "type": "number",
+      "description": "Maximum volume capacity in cubic meters"
+    },
+    "vehicle_type": {
+      "type": "string",
+      "description": "Type of vehicle (furgoneta, camion, moto, bicicleta, etc.)"
+    },
+    "traccar_device_id": {
+      "type": "string",
+      "description": "Traccar GPS device identifier for real-time tracking"
+    },
+    "status": {
+      "type": "string",
+      "description": "Operational status: available, in_route, maintenance, inactive"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Free-form notes"
+    },
+    "created": {
+      "type": "string",
+      "description": "ISO 8601 creation timestamp"
+    },
+    "updated": {
+      "type": "string",
+      "description": "ISO 8601 last update timestamp"
+    }
+  }
+}
