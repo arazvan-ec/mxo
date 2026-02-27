@@ -1,0 +1,15 @@
+{
+  "id": "",
+  "type": "",
+  "channel": "in_app",
+  "recipient_type": "",
+  "recipient_id": "",
+  "title": "",
+  "message": "",
+  "entity_type": null,
+  "entity_id": null,
+  "read": false,
+  "sent_at": null,
+  "read_at": null,
+  "created_at": ""
+}
