@@ -1,0 +1,22 @@
+{
+  "task_id": "002_implement_mxo_track",
+  "title": "Implement mxo-track logistics platform (agent-native)",
+  "status": "in_progress",
+  "created": "2026-02-27T23:30:00Z",
+  "updated": "2026-02-27T23:30:00Z",
+  "description": "Implement the complete mxo-track last-mile logistics platform following agent-native architecture. File-based entity directories, atomic tool scripts (bash+jq+Python), composable workflows. 8 phases, 47 atomic commits.",
+  "acceptance_criteria": [
+    "All entity schemas defined in schemas/",
+    "CRUD tools for all entities in tools/",
+    "CSV import working with sample data",
+    "Route optimization with capacity validation",
+    "Route execution workflow (start, deliver, exception, POD, complete)",
+    "Public tracking by token",
+    "Reporting tools (delivery stats, driver performance, customer report)",
+    "Zone/RGU management and assignment",
+    "Cost analysis and dashboard data tools",
+    "All tools composable by agents"
+  ],
+  "dependencies": ["001_bootstrap_project"],
+  "tags": ["logistics", "agent-native", "core"]
+}
