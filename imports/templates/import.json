@@ -1,0 +1,16 @@
+{
+  "id": "",
+  "customer_id": "",
+  "file_name": "",
+  "status": "pending",
+  "total_rows": 0,
+  "created_count": 0,
+  "skipped_count": 0,
+  "error_count": 0,
+  "created_shipment_ids": [],
+  "created_service_ids": [],
+  "started_at": null,
+  "completed_at": null,
+  "created_at": "",
+  "updated_at": ""
+}
