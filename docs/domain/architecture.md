@@ -138,15 +138,15 @@ Operations live in `operations/{operation_name}/` as prompt files that agents ex
 
 | Operation                | Input                        | Output                        |
 |--------------------------|------------------------------|-------------------------------|
-| optimize_route           | Route with stops + coords    | Reordered stops, distance saved|
+| optimize_route           | Route + stops + strategy     | Circular-optimized stop order  |
 | calculate_eta            | Vehicle position + stops     | ETA per stop                  |
 | generate_delivery_note   | Route + stops + parcels      | Albarán (delivery note) .md   |
 | import_csv               | CSV file path + customer_id  | Created shipments, import log |
 | check_vehicle_capacity   | Vehicle + assigned parcels   | Fit/no-fit + utilization %    |
-| calculate_isochrone      | Origin point + time budget   | Reachable area boundary       |
+| calculate_isochrone      | Origin + time budget + shipments | RGU zones with sectors     |
 | analyze_driver_productivity | Driver + date range        | Success rate, avg time, ranking|
 | billing_summary          | Customer + date range        | Total shipments, delivered, exceptions, cost |
-| auto_assign_routes       | Shipments + available vehicles + drivers | Proposed routes    |
+| auto_assign_routes       | Shipments + vehicles + drivers | RGU-grouped optimized routes |
 
 ## Statuses
 
@@ -189,14 +189,38 @@ Before a route starts, the agent validates that total parcels fit the vehicle.
 
 ## RGU / Isochrones
 
-A **RGU** (Ruta Geográfica Unitaria) defines a geographic delivery zone based on travel time from an origin.
+A **RGU** (Ruta Geográfica Unitaria) defines a geographic delivery zone based on **round-trip** travel time from an origin. One RGU = one route = one driver + one vehicle.
 
-An **isochrone** is the boundary of all points reachable within a given time budget from an origin, considering road network and speed.
+An **isochrone** is the boundary of all points reachable from an origin within a specific time. A 60-minute isochrone = 30 min out + 30 min back (round trip).
 
-Used for:
-- Grouping deliveries into efficient routes
-- Ensuring all stops in a route are within driver's time budget
-- Measuring driver productivity per zone
+### RGU → Route Pipeline
 
-Data needed: origin coordinates, time budget (minutes), average speed.
-Output: set of reachable coordinates / polygon boundary.
+```
+Shipments → calculate_isochrone → RGU zones → split by capacity → create routes → optimize_route
+```
+
+1. `calculate_isochrone` groups shipments by reachable zone (round-trip budget)
+2. Large zones are split into **sectors** (angular slices from origin)
+3. Each sector becomes a route, matched to a vehicle + driver
+4. `optimize_route` orders stops within each route using a named strategy
+
+### Route Optimization Strategies
+
+All routes are **circular by default** (origin → stops → origin). Open routes (no return) are configurable per route.
+
+| Strategy | Name | Best for | How it works |
+|----------|------|----------|--------------|
+| `petalo` | Pétalo (Circular Clusters) | Dense urban, >15 stops | Sort by bearing, sweep circular sectors |
+| `zigzag` | Zigzag (Linear Sweep) | Corridor routes, highways | Sweep along dominant axis, alternate sides |
+| `nearest` | Nearest Neighbor | <10 stops, fallback | Always visit closest unvisited stop |
+| `farthest_first` | Farthest-First | One outlier + cluster | Go to farthest first, nearest-neighbor back |
+
+Default strategy: `petalo`. Configurable per route or auto-selected based on zone shape. Defined in `config/optimization.json`.
+
+### Circular Distance Calculation
+
+```
+total_distance = sum(stop-to-stop distances) + last_stop-to-origin
+```
+
+All distances apply a **road detour factor** (default 1.3×) to convert straight-line Haversine to estimated road distance.
