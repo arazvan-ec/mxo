@@ -58,6 +58,12 @@ Numeric prefix ensures chronological ordering. Description ensures human readabi
   - 9 agent operations defined as composable prompts
   - Config layer with roles, statuses, service types, vehicle types
   - CLAUDE.md updated with domain-specific rules
+- 2026-02-28: Route optimization strategies defined (task 004)
+  - 4 named strategies: petalo, zigzag, nearest, farthest_first
+  - Circular routing by default (configurable open routes)
+  - RGU-based grouping with round-trip time budget and sector division
+  - Full pipeline: RGU → capacity split → route → optimize → ETA → delivery note
+  - config/optimization.json with strategy params and auto-selection rules
 - 2026-02-28: API backend implemented (task 003)
   - Hono + TypeScript REST API over file-based storage
   - Generic CRUD engine for all 11 entity types
@@ -71,6 +77,7 @@ Numeric prefix ensures chronological ordering. Description ensures human readabi
 - `001_bootstrap_project` — Project initialization
 - `002_mxo_track_domain_model` — Full domain model for logistics platform
 - `003_api_backend` — REST API over file-based storage (Hono + TypeScript)
+- `004_optimization_strategies` — RGU-based circular routing with 4 named strategies (petalo, zigzag, nearest, farthest_first)
 
 ## Active Tasks
 
@@ -79,7 +86,7 @@ Numeric prefix ensures chronological ordering. Description ensures human readabi
 ## Next Steps
 
 - Create sample data (demo customer, vehicles, drivers, shipments)
-- Execute end-to-end flow: CSV import → route creation → optimization → delivery
-- Refine operation prompts based on first real executions
+- Execute end-to-end flow: CSV import → route creation → RGU grouping → optimization → delivery
+- Test each optimization strategy with real route data
 - Add pricing config for billing operations
 - Add frontend (React/Next.js) consuming the API

@@ -1,7 +1,7 @@
 {
   "task_id": "004_optimization_strategies",
   "title": "Define route optimization strategies with RGU-based circular routing",
-  "status": "in_progress",
+  "status": "completed",
   "created_at": "2026-02-28T12:00:00Z",
   "updated_at": "2026-02-28T12:00:00Z",
   "description": "Rewrite optimization prompts to support 4 named strategies (pétalo, zigzag, nearest-neighbor, farthest-first), enforce circular routing by default (configurable), and ensure RGU-based grouping feeds into route optimization.",
