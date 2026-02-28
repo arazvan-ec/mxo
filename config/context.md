@@ -12,6 +12,7 @@ Configuration files define the platform's reference data: roles, service types, 
 | service_types.json | Types of logistics services (delivery, return, etc)|
 | statuses.json      | All status values and valid transitions per entity  |
 | vehicle_types.json | Vehicle type templates with capacity defaults       |
+| optimization.json  | Route optimization strategies, RGU params, defaults |
 
 ## Design Decisions
 
@@ -26,3 +27,4 @@ Configuration files define the platform's reference data: roles, service types, 
 2. Read `config/roles.json` to determine what data a user/agent can access
 3. Read `config/vehicle_types.json` when creating a vehicle to apply default capacity
 4. Read `config/service_types.json` when creating a service to validate the type
+5. Read `config/optimization.json` for route optimization strategy defaults, RGU parameters, and auto-selection rules

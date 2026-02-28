@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.0.0",
+  "description": "Route optimization strategies and RGU calculation parameters",
+  "defaults": {
+    "optimization_strategy": "petalo",
+    "return_to_origin": true,
+    "time_budget_min": 120,
+    "stop_duration_min": 3,
+    "road_detour_factor": 1.3,
+    "average_speed_kmh": {
+      "urban": 25,
+      "suburban": 40,
+      "rural": 60,
+      "default": 25
+    }
+  },
+  "strategies": {
+    "petalo": {
+      "name": "Pétalo (Circular Clusters)",
+      "description": "Circular sweep by angular sectors from origin. Best for dense urban areas with many stops.",
+      "best_for": "Dense urban, many stops (>15)",
+      "sector_angle_degrees": 60,
+      "max_stops_before_sector_split": 15,
+      "ordering_within_sector": "nearest_from_origin_outward"
+    },
+    "zigzag": {
+      "name": "Zigzag (Linear Sweep)",
+      "description": "Linear sweep along dominant axis with alternating sides. Best for corridor routes.",
+      "best_for": "Stops along a road, highway, or boulevard",
+      "min_elongation_ratio": 2.0
+    },
+    "nearest": {
+      "name": "Nearest Neighbor",
+      "description": "Always visit the closest unvisited stop. Simple and predictable.",
+      "best_for": "Few stops (<10), irregular distribution, fallback"
+    },
+    "farthest_first": {
+      "name": "Farthest-First with Nearest Return",
+      "description": "Go to farthest stop first, then nearest-neighbor back. Handles outlier stops well.",
+      "best_for": "One far outlier plus nearby cluster"
+    }
+  },
+  "auto_selection_rules": [
+    {
+      "condition": "stop_count > 15 AND zone_shape = circular",
+      "strategy": "petalo",
+      "priority": 1
+    },
+    {
+      "condition": "zone_elongation_ratio > 2.0",
+      "strategy": "zigzag",
+      "priority": 2
+    },
+    {
+      "condition": "stop_count < 10",
+      "strategy": "nearest",
+      "priority": 3
+    },
+    {
+      "condition": "max_stop_distance > 2 * avg_stop_distance",
+      "strategy": "farthest_first",
+      "priority": 4
+    },
+    {
+      "condition": "default",
+      "strategy": "petalo",
+      "priority": 99
+    }
+  ],
+  "rgu": {
+    "description": "RGU (Ruta Geográfica Unitaria) calculation parameters",
+    "calculation_mode": "round_trip",
+    "sector_division": true,
+    "default_sector_count": 4,
+    "min_stops_per_sector": 5
+  }
+}
