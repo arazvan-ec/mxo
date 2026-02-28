@@ -1,0 +1,17 @@
+{
+  "task_id": "003_add_duckdb_analytics",
+  "title": "Add DuckDB as analytics query layer over JSON files",
+  "status": "pending",
+  "created": "2026-02-28",
+  "updated": "2026-02-28",
+  "description": "Replace manual JSON file traversal in reports with DuckDB queries. DuckDB reads JSON files directly (read_json), enabling fast analytical queries (GROUP BY, SUM, AVG) without importing data. JSON files remain the source of truth for CRUD; DuckDB is the read-only analytics layer.",
+  "acceptance_criteria": [
+    "tools/db/query.py — DuckDB wrapper that reads entity JSON files directly via read_json",
+    "tools/db/views.sql — Predefined SQL views for common agent queries (delivery_stats, driver_performance, cost_analysis, trends)",
+    "Existing reports refactored to use DuckDB instead of manual file traversal",
+    "No data duplication — JSON files remain single source of truth",
+    "Zero infrastructure — DuckDB runs embedded (in-process or single file)"
+  ],
+  "dependencies": ["002_implement_mxo_track"],
+  "tags": ["analytics", "duckdb", "performance", "reports"]
+}

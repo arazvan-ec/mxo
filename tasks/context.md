@@ -63,4 +63,4 @@ Numeric prefix ensures chronological ordering. Description ensures human readabi
 
 ## Active Tasks
 
-(No active tasks)
+- **003_add_duckdb_analytics** — pending — Add DuckDB as analytics query layer over JSON files
