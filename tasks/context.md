@@ -78,6 +78,7 @@ Numeric prefix ensures chronological ordering. Description ensures human readabi
 - `002_mxo_track_domain_model` — Full domain model for logistics platform
 - `003_api_backend` — REST API over file-based storage (Hono + TypeScript)
 - `004_optimization_strategies` — RGU-based circular routing with 4 named strategies (petalo, zigzag, nearest, farthest_first)
+- `005_evaluate_tech_stack` — Comprehensive tech stack evaluation and recommendation
 
 ## Active Tasks
 
@@ -85,8 +86,10 @@ Numeric prefix ensures chronological ordering. Description ensures human readabi
 
 ## Next Steps
 
-- Create sample data (demo customer, vehicles, drivers, shipments)
-- Execute end-to-end flow: CSV import → route creation → RGU grouping → optimization → delivery
-- Test each optimization strategy with real route data
-- Add pricing config for billing operations
-- Add frontend (React/Next.js) consuming the API
+- Phase 1: Add SQLite index layer (better-sqlite3) to file_store.ts
+- Phase 2: Add real-time SSE endpoints with chokidar file watching
+- Phase 3: Add BullMQ workers with Redis for async operations
+- Phase 4: Build Next.js dashboard (operator + public tracking)
+- Phase 5: Build Expo/React Native driver mobile app
+- Phase 6: Integrate self-hosted OSRM for routing
+- Phase 7: Kubernetes production deployment with monitoring
