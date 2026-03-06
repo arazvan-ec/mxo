@@ -1,8 +1,14 @@
 # mxo-track: Tech Stack Recommendation
 
-## What Already Exists
+## Developer Profile
 
-The codebase already has a working foundation:
+- **Solo developer**, PHP background, no other language experience
+- **AI as co-developer** (Claude, Copilot) — this is the primary "team member"
+- **Scale**: 5-20 B2B clients, 500-5000 shipments/day in 12 months
+- **Mobile**: PWA first, native app later when background GPS is needed
+- **Starting clean**: no PHP legacy to maintain
+
+## What Already Exists
 
 - **Backend**: Hono framework on Node.js with TypeScript (~600 lines across 7 source files)
 - **Storage**: Generic file-based CRUD engine (`file_store.ts`) — directories as entities, JSON files as records
@@ -10,6 +16,17 @@ The codebase already has a working foundation:
 - **Operations**: 9 agent operations defined as prompt files (Markdown, not code)
 - **ID Generation**: Custom ULID implementation (time-sortable, Crockford Base32)
 - **Zero external dependencies** beyond Hono and its Node.js adapter
+
+---
+
+## Why TypeScript, Not PHP
+
+Although PHP/Laravel would be productive from day 1, TypeScript wins for this project:
+
+1. **The backend is already built** in TypeScript/Hono. Rewriting to PHP is moving backward.
+2. **One language for everything**: backend, dashboard, PWA, and eventually native mobile. With PHP you still need JavaScript for the frontend.
+3. **AI as co-developer**: Claude and Copilot are measurably stronger generating TypeScript than PHP. As a solo developer relying on AI, this multiplies your output.
+4. **Learning curve**: ~1-2 weeks with AI assistance. TypeScript syntax resembles modern PHP (types, classes, arrow functions).
 
 ---
 
@@ -23,45 +40,45 @@ The existing `crud_factory.ts` + `file_store.ts` + `entities.ts` pattern is a wo
 - Hono runs everywhere (Node.js, Cloudflare Workers, Deno, Bun).
 - The middleware pattern (auth, tenant filter) is clean and idiomatic.
 
+**Evolve, don't replace:**
+- Add Zod for runtime validation
+- Add Vitest for tests
+
 | Alternative | Why rejected |
 |---|---|
-| **Fastify** | Heavier, plugin ecosystem not needed. Faster JSON serialization irrelevant when bottleneck is filesystem I/O. Full rewrite required. |
-| **NestJS** | Over-engineered. Decorators, DI, modules add ceremony contradicting agent-native simplicity. |
-| **Go (Gin/Chi)** | Breaks full-TypeScript strategy. Performance advantage irrelevant at 10-50 clients. |
-| **Elixir (Phoenix)** | Different runtime/deployment/language. Real-time better added as focused component. |
+| **Fastify** | Heavier, plugin ecosystem not needed. Full rewrite required. |
+| **NestJS** | Over-engineered. Decorators, DI, modules add ceremony contradicting simplicity. |
+| **Go (Gin/Chi)** | Breaks full-TypeScript strategy. Performance irrelevant at this scale. |
+| **PHP/Laravel** | Familiar but doesn't unify frontend+backend. Worse AI tooling. |
 
 ---
 
 ## Decision 2: Real-Time Layer
 
-### Recommendation: **SSE for dashboards/tracking + WebSocket for driver app**
+### Recommendation: **SSE first, WebSocket later**
 
 ```
                     SSE (one-way)
-  Dashboard/Customer ←──────────── Hono API ←── fs.watch on entity dirs
+  Dashboard/Customer ←──────────── Hono API ←── chokidar watching files
   Tracking Page      ←────────────
-
-                    WebSocket (bidirectional)
-  Driver App         ←──────────→ Dedicated WS endpoint ←── fs.watch
 ```
 
-**SSE for dashboards/tracking** because:
-- Tracking is read-only. SSE is simpler, works through proxies/CDNs, auto-reconnects.
-- Node.js `chokidar` watches entity directories. When a JSON file changes, the watcher pushes via SSE.
+**Start with SSE only** because:
+- All current use cases are read-only (dashboard updates, tracking).
+- SSE is simpler than WebSocket, works through proxies/CDNs, auto-reconnects.
 - Hono supports SSE natively via `hono/streaming`. No additional dependency.
-
-**WebSocket for driver app** because:
-- Drivers send GPS coordinates AND receive route updates — bidirectional.
+- `chokidar` watches entity directories — when a JSON file changes, push via SSE.
 
 **Endpoints to add:**
-- `GET /api/stream/{entity}/{id}` — SSE for specific entity
+- `GET /api/stream/{entity}/{id}` — SSE for specific entity changes
 - `GET /api/stream/tracking/{token}` — SSE for public tracking
-- `WS /api/ws/driver/{driver_id}` — WebSocket for driver
+
+**When to add WebSocket:** When the native driver app needs bidirectional communication (sending GPS + receiving route updates simultaneously). Not needed for PWA phase.
 
 | Alternative | Why rejected |
 |---|---|
-| **Socket.io** | 300KB+ client library, unnecessary fallback transports. |
-| **Redis Pub/Sub** | Non-file dependency. The filesystem IS the pub/sub. |
+| **Socket.io** | 300KB+ client library, unnecessary complexity. |
+| **Redis Pub/Sub** | Adds infrastructure. The filesystem IS the event source. |
 | **MQTT** | Adds broker dependency. Only justified at thousands of vehicles. |
 
 ---
@@ -72,9 +89,9 @@ The existing `crud_factory.ts` + `file_store.ts` + `entities.ts` pattern is a wo
 
 This is the most critical architectural decision.
 
-**The problem:** `listAll` reads every entity directory and parses every JSON file. At 10,000+ shipments/day, this is a performance wall.
+**The problem:** `listAll` reads every entity directory and parses every JSON file. At 5,000 shipments/day, within a month you have 150,000 files. Not viable.
 
-**The solution:** SQLite is literally a file — philosophically compatible with files-as-universal-interface.
+**The solution:** SQLite is literally a file — zero infrastructure, philosophically compatible with files-as-universal-interface.
 
 ```
 Source of truth:  shipments/{id}/shipment.json   (always authoritative)
@@ -82,76 +99,58 @@ Query index:      data/index.sqlite               (derived, rebuildable)
 ```
 
 **How it works:**
-1. **Write path**: When `file_store.ts` creates/updates a JSON file, it ALSO updates the SQLite index row.
-2. **Read path**: `getById` still reads JSON directly. `listAll` with filters queries SQLite for matching IDs, then reads only those JSON files.
-3. **Rebuildable**: A `rebuild-index` operation can repopulate SQLite from JSON files. If deleted, system falls back to scanning.
+1. **Write path**: `file_store.ts` creates/updates JSON AND updates SQLite index row.
+2. **Read path**: `getById` reads JSON directly. `listAll` with filters queries SQLite for matching IDs, then reads only those JSON files.
+3. **Rebuildable**: A `rebuild-index` command repopulates SQLite from JSON files. If deleted, system falls back to scanning.
 4. **Geo queries**: Simple lat/lon bounding box queries become possible.
 
-**Index schema sketch:**
+**Library: `better-sqlite3`** — synchronous, fastest Node.js SQLite binding.
 
-```sql
-CREATE TABLE shipments_idx (
-  id TEXT PRIMARY KEY,
-  customer_id TEXT,
-  status TEXT,
-  recipient_city TEXT,
-  latitude REAL,
-  longitude REAL,
-  created_at TEXT,
-  updated_at TEXT
-);
-CREATE INDEX idx_shipments_customer ON shipments_idx(customer_id);
-CREATE INDEX idx_shipments_status ON shipments_idx(status);
-```
+**Why NOT PostgreSQL:** Requires a separate running server process. At 5,000 shipments/day, SQLite handles this trivially. PostgreSQL becomes worth considering only at hundreds of thousands of records with heavy concurrent writes.
 
-**Library: `better-sqlite3`** — synchronous, fastest Node.js SQLite binding. Synchronous reads are actually faster for index lookups (no async overhead).
-
-| Alternative | Why rejected |
+| Alternative | Why rejected for solo developer |
 |---|---|
-| **PostgreSQL/MySQL** | Violates files-as-universal-interface. Requires separate server. |
-| **Redis** | In-memory, not a file. Not inspectable. |
-| **LevelDB/RocksDB** | Binary format, not inspectable. No SQL. |
-| **JSON scanning + in-memory cache** | Doesn't scale to tens of thousands of entities. |
-
-**Risk:** Index can become stale if JSON files edited outside the API. Mitigation: periodic reconciliation or `chokidar` watching.
+| **PostgreSQL/MySQL** | Separate server to manage. Overkill at this scale. |
+| **Redis** | In-memory, not a file. Requires separate process. |
+| **JSON scanning + cache** | Doesn't scale past a few thousand entities. |
 
 ---
 
-## Decision 4: Mobile App (Driver App)
+## Decision 4: Driver Interface
 
-### Recommendation: **React Native with Expo**
+### Recommendation: **PWA first, React Native + Expo later**
 
-1. **Full TypeScript stack** — shared types, validation, business constants with backend.
-2. **Expo handles the hard parts:**
-   - Background GPS: `expo-location` + `startLocationUpdatesAsync`
-   - Camera/barcode: `expo-camera`, `expo-barcode-scanner`
-   - Push notifications: `expo-notifications`
-   - Signature capture: `react-native-signature-canvas`
-   - Offline-first: `expo-file-system` + `expo-sqlite`
-3. **EAS** provides cloud builds and OTA updates.
-4. **Agent-friendly** — AI agents read/modify TypeScript/JSX with high fluency.
+**Phase 1 (now): PWA**
+- Part of the same dashboard project — responsive views for mobile
+- Service worker for offline caching
+- Geolocation API for GPS reporting (foreground only)
+- Camera API for barcode scanning (works in modern browsers)
+- Zero app store deployment — instant updates
+
+**Phase 2 (when needed): React Native + Expo**
+- When you need **background GPS** (driver's phone in pocket while driving)
+- When you need **push notifications** that work reliably on iOS
+- Expo handles: background location, camera, barcode, signature capture, offline SQLite
+- Full TypeScript — shared types with backend
+
+**When to switch:** When customers demand that drivers' positions update even with the screen off. This is the PWA's hard limitation.
 
 | Alternative | Why rejected |
 |---|---|
-| **Flutter** | Dart breaks full-TypeScript strategy. Lower agent fluency with Dart. |
-| **Native (Swift + Kotlin)** | Two codebases, double maintenance. Not justified for logistics app. |
-| **PWA** | Cannot do reliable background GPS on iOS. Limited push notifications. |
-
-**Critical capabilities:**
-- Offline queue: local SQLite when offline, sync on connectivity
-- Background GPS: `TaskManager` + `expo-location`
-- Low battery awareness: reduce GPS frequency
+| **Flutter** | Dart breaks full-TypeScript strategy. |
+| **Native (Swift + Kotlin)** | Two codebases for a solo developer. Unmanageable. |
 
 ---
 
 ## Decision 5: Frontend Dashboard
 
-### Recommendation: **Next.js (App Router) with React**
+### Recommendation: **Vite + React** (not Next.js)
 
-1. **TypeScript + React** — same component model as mobile app.
-2. **SSR for public tracking** — instant load for `track.mxo.com/TRK-XXXX-XXXX`, good for WhatsApp link previews.
-3. **API Routes as BFF** — aggregate multiple API calls for complex dashboard views.
-4. **React Server Components** — server-side data fetching, streaming to client.
+Next.js is powerful but too complex for a solo developer: App Router, Server Components, caching strategies, deployment quirks. For a B2B internal dashboard:
+
+- **Vite + React** is simple: scaffold, write components, deploy as static files.
+- The dashboard is internal — SSR is not needed.
+- Public tracking: a simple route in the SPA, or a lightweight SSR endpoint on the Hono API itself.
 
 **Dashboard sections:**
 
@@ -159,55 +158,49 @@ CREATE INDEX idx_shipments_status ON shipments_idx(status);
 |---|---|---|
 | Operations dashboard | operator, admin | Live map, active routes, vehicle positions, alerts |
 | Customer portal | customer | Shipment list, tracking, CSV import, billing |
-| Driver management | operator | Driver list, productivity stats, assignments |
 | Route planning | operator | Create/edit routes, drag-and-drop stops, optimize |
 | Public tracking | public | Shipment timeline, map position |
-| Admin panel | admin | Customer management, config, audit logs |
 
-**Map component:** `react-map-gl` (Mapbox GL JS) or `@vis.gl/react-google-maps`.
+**Map component:** Leaflet (free, open source) or `react-map-gl` (Mapbox GL JS).
 
-| Alternative | Why rejected |
+| Alternative | Why rejected for solo developer |
 |---|---|
-| **Vite + React SPA** | No SSR for tracking pages. More moving parts. |
-| **Remix** | Smaller ecosystem and community than Next.js. |
-| **Angular** | Different paradigm. RxJS adds complexity. |
-| **Vue/Nuxt** | Team already investing in React for mobile. |
+| **Next.js** | App Router/RSC complexity not justified for internal dashboard. |
+| **Angular** | Different paradigm, steeper learning curve. |
+| **Vue/Nuxt** | Breaks consistency with React (needed later for React Native). |
 
-**Deployment note:** Use `output: 'standalone'` in `next.config.js` for Docker deployment.
+**When to consider Next.js:** If the public tracking page becomes a significant marketing/SEO asset and needs SSR with good social sharing previews. Can migrate React components to Next.js since they're the same library.
 
 ---
 
 ## Decision 6: Message Queue / Event System
 
-### Recommendation: **BullMQ (Redis-backed job queue)**
+### Recommendation: **In-process queue first (`p-queue`), BullMQ later**
 
-1. **Operations map to jobs:** Route optimization, ETA calculation, billing summary — trigger async, write results to files.
-2. **Redis is justified anyway** for: WebSocket session state, rate limiting, temporary caches.
-3. **`bull-board`** provides web UI for queue observability.
+At your current scale, Redis + BullMQ is over-engineering.
 
-```
-Queue: operations
-Jobs:
-  - optimize_route      { route_id: "..." }
-  - calculate_eta       { route_id: "..." }
-  - import_csv          { import_id: "..." }
-  - generate_delivery_note { route_id: "..." }
-  - send_notification   { notification_id: "..." }
+**Start with `p-queue`** (~2KB npm package):
+- Limits concurrency (e.g., max 2 route optimizations at once)
+- Processes jobs in order
+- Zero infrastructure — runs in the API process
 
-Queue: tracking
-Jobs:
-  - update_position     { vehicle_id: "...", lat: ..., lon: ... }
-  - sync_tracking       { shipment_id: "..." }
-```
+**Use cases (all fast enough in-process):**
+- Route optimization
+- CSV import
+- PDF/delivery note generation
+- Notification sending
 
-| Alternative | Why rejected |
+**When to add BullMQ + Redis:**
+- When operations take >30 seconds and you need to show progress
+- When you need retry logic for failed jobs
+- When you run multiple API instances (need shared queue)
+- When you need `bull-board` for queue observability
+
+| Alternative | Why rejected for now |
 |---|---|
-| **RabbitMQ** | Over-engineered for this use case. |
-| **Kafka** | Operational overhead absurd at 10-50 clients. |
-| **File-based queue** | Lacks retry, concurrency control, dead-letter handling. |
-| **Temporal/Inngest** | Too much infrastructure complexity. |
-
-**Risk:** Redis requires persistence config (`appendonly yes`). Data is always derived/transient — source of truth remains in files.
+| **BullMQ + Redis** | Adds Redis dependency. Not needed at current scale. |
+| **RabbitMQ** | Way over-engineered. |
+| **Kafka** | Absurd at this scale. |
 
 ---
 
@@ -217,154 +210,154 @@ Jobs:
 
 | Capability | Provider | Why |
 |---|---|---|
-| Route calculation / distance matrix | Self-hosted OSRM | Free, unlimited, offline. Critical for optimization (30-stop route = 900 distance calculations). |
+| Route calculation / distance matrix | Self-hosted OSRM | Free, unlimited. Critical for optimization (30 stops = 900 distance calculations). |
 | Geocoding | Google Maps Geocoding API | Best accuracy for Spanish/European addresses. 40K free calls/month. |
 | Isochrones | OpenRouteService or Valhalla (self-hosted) | OSRM lacks native isochrone support. |
-| Client-side maps | Mapbox GL JS or Google Maps JS | Dashboard live map and tracking page. |
-| Driver app map | `react-native-maps` | Native performance on iOS/Android. |
+| Client-side maps | Leaflet (free) or Mapbox GL JS | Dashboard live map and tracking page. |
 
 **Why self-hosted OSRM is essential:**
-- Google Distance Matrix: $5 per 1000 elements. 30-stop route = $4.50 per optimization.
+- Google Distance Matrix: $5 per 1000 elements. 30-stop route optimization = $4.50 per run.
 - OSRM: zero per query. Spain OSM extract ~1GB. Thousands of req/sec.
+- Runs as a Docker container alongside your API.
 
-| Alternative | Why rejected |
-|---|---|
-| **Google Maps exclusively** | Cost scales linearly. Expensive at volume. |
-| **Mapbox Directions** | Pay-per-request. Same cost problem. |
-| **HERE API** | Expensive, vendor-locked. |
+**Cost: ~€0/month** for OSRM + €0 for geocoding up to 40K calls.
 
 ---
 
 ## Decision 8: DevOps
 
-### Recommendation: **Docker Compose (dev) + Kubernetes (prod) + GitHub Actions (CI/CD) + Grafana (monitoring)**
+### Recommendation: **Hetzner VPS + Docker Compose + Caddy** (not Kubernetes)
 
-**Docker Compose (development):**
+Kubernetes is for teams and complex multi-service deployments. For a solo developer:
+
+**Hosting: Hetzner VPS**
+- €10-20/month for 4-8GB RAM in Europe
+- Full control, excellent price/performance
+- Persistent disk for file-based storage
+
+**Orchestration: Docker Compose**
 
 ```yaml
 services:
   api:
     build: ./api
     volumes:
-      - ./:/data
+      - ./data:/data
     ports: ["3000:3000"]
 
   dashboard:
     build: ./dashboard
-    ports: ["3001:3000"]
-
-  redis:
-    image: redis:7-alpine
-    command: redis-server --appendonly yes
+    ports: ["3001:80"]
 
   osrm:
     image: osrm/osrm-backend
-    ports: ["5000:5000"]
-
-  worker:
-    build: ./api
-    command: tsx src/worker.ts
     volumes:
-      - ./:/data
+      - ./geo/osrm-data:/data
+    ports: ["5000:5000"]
+    command: osrm-routed --algorithm mld /data/spain-latest.osrm
 ```
 
-**Key principle:** API and worker mount the workspace as a volume — same files accessible from host, containers, and agent sessions.
+**Reverse proxy: Caddy**
+- Auto-HTTPS (Let's Encrypt) with zero config
+- Simpler than nginx for a solo developer
+- Reverse proxy to API + dashboard containers
 
-**Monitoring:**
+**Deploy pipeline:**
+```
+git push → GitHub Actions → build Docker images → SSH to VPS → docker compose pull && up -d
+```
 
-| Component | Tool |
+**When to consider Kubernetes:** When you need 3+ servers, auto-scaling, or multi-region. Years away at your scale.
+
+| Alternative | Why rejected for solo developer |
 |---|---|
-| Metrics | Prometheus + Grafana |
-| Logs | Loki or stdout + Docker logs |
-| Alerts | Grafana alerting |
+| **Kubernetes** | Operational overhead not justified for 1 server. |
+| **Fly.io / Railway** | Limit volume mount flexibility needed for file-based architecture. |
+| **Serverless (Lambda)** | Incompatible with file-based storage (ephemeral filesystem). |
 
-**Critical alert:** Disk usage (70%, 80%, 90%). In file-based storage, running out of disk is catastrophic.
-
-| Alternative | Why rejected |
-|---|---|
-| **Fly.io / Railway** | Limit volume mount flexibility. |
-| **Serverless (Lambda)** | Incompatible with file-based storage. |
+**Critical monitoring:** Set up disk usage alerts (70%, 80%, 90%). In file-based storage, running out of disk is catastrophic. Simple cron job + email alert is sufficient to start.
 
 ---
 
-## Decision 9: Full TypeScript Stack
+## Decision 9: Language Strategy
 
-### Recommendation: **TypeScript everywhere. Strongest recommendation in this document.**
+### Recommendation: **Full TypeScript everywhere**
 
-| Factor | Full TypeScript | Polyglot |
-|---|---|---|
-| Agent fluency | AI agents most fluent in TS. Entire codebase readable/modifiable. | Context-switching increases errors. |
-| Shared types | Written once, used in API, dashboard, mobile, worker. | Code generation or manual sync required. |
-| Team onboarding | One language. Easiest transition from PHP. | Each language is a barrier. |
-| Tooling | One linter, formatter, test runner, build system. | Each language has its own ecosystem. |
+| Layer | Technology |
+|---|---|
+| Backend API | TypeScript + Hono + Node.js |
+| Dashboard | TypeScript + Vite + React |
+| Driver PWA | TypeScript + React (same project) |
+| Future mobile app | TypeScript + React Native + Expo |
+| Scripts/tools | TypeScript + tsx |
 
-**The stack:**
-
-```
-Backend API:        TypeScript + Hono + Node.js
-Background workers: TypeScript + BullMQ + Node.js
-Dashboard:          TypeScript + Next.js + React
-Mobile app:         TypeScript + React Native + Expo
-Shared types:       TypeScript package (monorepo)
-Scripts/tools:      TypeScript + tsx
-```
-
-**Monorepo evolution** with `npm workspaces` or `turborepo`:
-
-```
-mxo/
-├── packages/shared/      # Shared types, constants, validation
-├── api/                  # Hono API (existing)
-├── worker/               # BullMQ workers
-├── dashboard/            # Next.js
-├── mobile/               # Expo/React Native
-├── (existing entity dirs, operations, config, etc.)
-```
+**Why this matters for a solo developer with AI:**
+- AI agents generate TypeScript with higher accuracy than any other language
+- One set of tooling: one linter (ESLint), one formatter (Prettier), one test runner (Vitest)
+- Shared types between backend and frontend — define once, use everywhere
+- Coming from PHP, TypeScript is the closest web-oriented typed language
 
 ---
 
 ## Summary Matrix
 
-| Decision | Choice | Confidence |
-|---|---|---|
-| Backend framework | **Keep Hono** | Very high |
-| Real-time | **SSE + WebSocket + chokidar** | High |
-| Storage | **Files + SQLite index (`better-sqlite3`)** | High |
-| Mobile | **React Native + Expo** | High |
-| Dashboard | **Next.js (App Router)** | Medium-high |
-| Message queue | **BullMQ + Redis** | High |
-| Mapping/Geo | **OSRM (self-hosted) + Google Maps API** | High |
-| DevOps | **Docker Compose + K8s + GitHub Actions** | High |
-| Language strategy | **Full TypeScript** | Very high |
+| Decision | Choice | Confidence | Scale-up path |
+|---|---|---|---|
+| Language | **TypeScript** | Very high | — |
+| Backend | **Keep Hono** | Very high | — |
+| Storage | **Files + SQLite** | High | → PostgreSQL as index if needed |
+| Dashboard | **Vite + React** | High | → Next.js if SSR needed |
+| Driver | **PWA** | High | → React Native + Expo |
+| Real-time | **SSE** | High | → + WebSocket for native app |
+| Queue | **p-queue (in-process)** | High | → BullMQ + Redis |
+| Mapping | **OSRM + Google Geocoding** | High | — |
+| Hosting | **Hetzner + Docker + Caddy** | High | → Kubernetes |
+
+Every choice has a clear upgrade path. Start simple, scale each piece when you hit its limits.
 
 ---
 
-## Implementation Sequence
+## Implementation Phases
 
-Each phase produces a deployable increment:
+Each phase ends with something deployable:
 
-1. **Phase 1: SQLite Index Layer** — Add `better-sqlite3`, modify `file_store.ts` to dual-write, add index rebuild command. Unblocks query performance.
+### Phase 1: SQLite Index Layer
+- Add `better-sqlite3` to API
+- Modify `file_store.ts` for dual-write (JSON + SQLite)
+- Add `rebuild-index` command
 
-2. **Phase 2: Real-Time (SSE)** — Add `chokidar` file watching and SSE endpoints. Enables live tracking.
+### Phase 2: Dashboard MVP
+- Scaffold Vite + React in `dashboard/`
+- Operator view: shipment list, route list, basic stats
+- Customer portal: their shipments, CSV import
 
-3. **Phase 3: BullMQ Workers** — Add Redis, create worker process, migrate async operations to job queue.
+### Phase 3: Real-Time + Public Tracking
+- SSE endpoints in Hono API
+- `chokidar` file watching
+- Public tracking page
 
-4. **Phase 4: Dashboard** — Next.js consuming the existing API. Operator dashboard + public tracking page.
+### Phase 4: Driver PWA
+- Responsive driver views in dashboard
+- Geolocation reporting
+- Delivery confirmation + signature
 
-5. **Phase 5: Driver Mobile App** — Expo project with GPS, barcode scanning, delivery confirmation.
+### Phase 5: OSRM + Route Optimization
+- OSRM Docker container with Spain data
+- Integrate with `optimize_route` operation
+- Replace Haversine with real road distances
 
-6. **Phase 6: OSRM Integration** — Self-hosted routing for `optimize_route` and `calculate_isochrone`.
-
-7. **Phase 7: Kubernetes Deployment** — Production infra, monitoring, alerting.
-
-No phase depends on a later phase. Each ends with a working system.
+### Phase 6: Production Deploy
+- Docker Compose with API + dashboard + OSRM
+- Hetzner VPS + Caddy
+- GitHub Actions CI/CD
+- Backup strategy for file storage
 
 ---
 
 ## Critical Files for Implementation
 
 - `api/src/storage/file_store.ts` — Must be extended with SQLite indexing
-- `api/src/index.ts` — Where SSE/WebSocket endpoints will be mounted
+- `api/src/index.ts` — Where SSE endpoints will be mounted
 - `api/src/routes/entities.ts` — Entity registry; SQLite schema derived from configs
 - `api/src/routes/crud_factory.ts` — Pattern to follow for streaming/query endpoints
 - `operations/optimize_route/prompt.md` — Integration point for OSRM

@@ -71,6 +71,11 @@ Numeric prefix ensures chronological ordering. Description ensures human readabi
   - Multi-tenancy filtering by customer_id/driver_id
   - Operations API for listing and reading agent prompts
   - Config API for platform configuration
+- 2026-03-06: Tech stack evaluated and refined (task 005)
+  - Full TypeScript stack confirmed (backend, dashboard, PWA, future mobile)
+  - Simplified for solo developer: Vite+React (not Next.js), p-queue (not BullMQ), Hetzner VPS (not K8s)
+  - Key decisions: Hono, Files+SQLite, SSE, OSRM, Caddy
+  - Each decision has clear scale-up path documented
 
 ## Completed Tasks
 
@@ -87,9 +92,8 @@ Numeric prefix ensures chronological ordering. Description ensures human readabi
 ## Next Steps
 
 - Phase 1: Add SQLite index layer (better-sqlite3) to file_store.ts
-- Phase 2: Add real-time SSE endpoints with chokidar file watching
-- Phase 3: Add BullMQ workers with Redis for async operations
-- Phase 4: Build Next.js dashboard (operator + public tracking)
-- Phase 5: Build Expo/React Native driver mobile app
-- Phase 6: Integrate self-hosted OSRM for routing
-- Phase 7: Kubernetes production deployment with monitoring
+- Phase 2: Build Vite + React dashboard MVP (operator + customer views)
+- Phase 3: Add real-time SSE endpoints with chokidar file watching + public tracking
+- Phase 4: Driver PWA with geolocation and delivery confirmation
+- Phase 5: Integrate self-hosted OSRM for real road routing
+- Phase 6: Production deploy (Hetzner VPS + Docker Compose + Caddy)
